@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Motion Sensor Dashboard</title>
+<link rel="stylesheet" href="/static/style.css">
+<script>
+function fetchMotionStatus() {
+    fetch('/motion_status')
+        .then(response => response.json())
+        .then(data => {
+            const banner = document.getElementById('alert-banner');
+            if(data.motion_detected) {
+                banner.style.display = 'block';
+                banner.innerText = '⚠️ Motion Detected!';
+            } else {
+                banner.style.display = 'none';
+            }
+
+            const log = document.getElementById('event-log');
+            log.innerHTML = '';
+            data.motion_events.forEach(event => {
+                const li = document.createElement('li');
+                li.innerText = event;
+                log.appendChild(li);
+            });
+        })
+        .catch(err => console.error(err));
+}
+setInterval(fetchMotionStatus, 1000);
+</script>
+</head>
+<body>
+<div class="container">
+    <h2>🤖 Smart AI Motion Sensor — Codenet Developers</h2>
+    <div id="alert-banner" style="display:none;"></div>
+    <div class="dashboard">
+        <div class="video-container">
+            <img src="{{ url_for('video_feed') }}" id="camera-feed">
+        </div>
+        <div class="log-container">
+            <h3>Recent Motion Events:</h3>
+            <ul id="event-log"></ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>
